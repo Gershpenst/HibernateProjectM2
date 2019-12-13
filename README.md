@@ -14,7 +14,7 @@ mysql> exit
 $ mysql --user=root --password=<password> PROJETM2 < dump_projet_spring_ali_NEHME_15600238.sql
 ```
 Pour relier Hibernate avec la base de donnée, rendez-vous dans:
-/TP3/src/main/webapp/WEB-INF/dispatcher-servlet.xml
+`/TP3/src/main/webapp/WEB-INF/dispatcher-servlet.xml`
 Changez la valeur de la variable `"value"` pour la property `name="password"` en mettant votre vrai mot de passe root: 
 ```
 <property name="password" value="<password>" />
