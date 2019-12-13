@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:mvc="http://www.springframework.org/schema/mvc"
+    xmlns:tx="http://www.springframework.org/schema/tx"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans 
+    http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+    http://www.springframework.org/schema/context
+    http://www.springframework.org/schema/context/spring-context-4.0.xsd
+    http://www.springframework.org/schema/mvc
+    http://www.springframework.org/schema/mvc/spring-mvc.xsd
+    http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd">
+
+    <bean id="messageSource"
+        class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+        <property name="basename" value="classpath:messages" />
+        <property name="defaultEncoding" value="ISO-8859-1" />
+    </bean>
+    
+    <mvc:annotation-driven />
+    <context:component-scan base-package="controller" />
+    <context:component-scan base-package="DAO" />
+    <context:component-scan base-package="Entity" />
+    <context:component-scan base-package="Service" />
+    
+    <!-- <context:component-scan base-package="net.controller" /> -->
+    
+       <bean
+        class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix">
+            <value>/vues/</value>
+        </property>
+        <property name="suffix">
+            <value>.jsp</value>
+        </property>
+    </bean>
+    
+        <mvc:resources mapping="/vues/**" location="/vues/"  
+	cache-period="31556926"/>
+    
+    <!--
+    <tx:annotation-driven transaction-manager="transactionManager" />
+
+    <bean id="dataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
+        <property name="jndiName" value="java:comp/env/jdbc/dsMonApplication" />
+    </bean>
+
+    <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+        <property name="dataSource" ref="dataSource" />
+    </bean>
+
+    <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+        <property name="entityManagerFactory" ref="entityManagerFactory" />
+    </bean>
+    -->
+    
+    <!-- 
+     <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+	   	<property name="driverClassName" value="com.mysql.jdbc.Driver" />
+	    <property name="url" value="jdbc:mysql://localhost:3306/TP2" />
+	    <property name="root" value="root" />
+	    <property name="password" value="" />
+	</bean>
+	-->
+    
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+
+	
+	<!-- Permet de connecter la base de donnée  -->
+	 <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+	   	<property name="driverClassName" value="com.mysql.jdbc.Driver" />
+	    <property name="url" value="jdbc:mysql://localhost:3306/PROJETM2" />
+	    <property name="username" value="root" />
+	    <property name="password" value="password" />
+	</bean>
+     
+    <!-- Permet d'aller chercher les données vers la base de donnée -->
+	<bean id="transactionManager"  class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory" />
+  	</bean>
+    
+  	<!-- Hibernate 4 SessionFactory Bean definition -->
+  	<bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+    	<property name="dataSource" ref="dataSource" />
+        <property name="annotatedClasses">
+        	<!-- Je suppose que les 'Entity' devront être déclarer ici -->
+            <list>
+                <value>Entity.Country</value>
+                <value>Entity.Street</value>
+                <value>Entity.Area</value>
+                <value>Entity.City</value>
+                <value>Entity.Language</value>
+            </list>
+        </property>
+        <property name="hibernateProperties">
+            <props>
+                <prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
+                <prop key="hibernate.show_sql">true</prop>
+            </props>
+        </property>
+  	</bean>
+  	
+  	<!-- 
+  		NB: "serviceCountry", "countryDAO", "sessionFactory" (id, name, ref) s'utilise 
+  		dans les classes "countryController", "ServiceCountry", "CountryDAO" respectivement.
+  	 -->
+  
+	<!-- Relie les services avec les DAO -->
+	<bean id="serviceCountry" class="Service.CountryService">
+	      <property name="countryDAO" ref="countryDAO"/>
+	</bean>
+	
+	<bean id="serviceStreet" class="Service.StreetService">
+	      <property name="streetDAO" ref="streetDAO"/>
+	</bean>
+	
+	<bean id="serviceArea" class="Service.AreaService">
+	      <property name="AreaDAO" ref="AreaDAO"/>
+	</bean>
+	
+	<bean id="serviceCity" class="Service.CityService">
+	      <property name="CityDAO" ref="CityDAO"/>
+	</bean>
+	
+	<bean id="serviceLanguage" class="Service.LanguageService">
+	      <property name="LanguageDAO" ref="LanguageDAO"/>
+	</bean>
+  
+  	<bean id="serviceSearch" class="Service.SearchService">
+	      <property name="SearchDAO" ref="SearchDAO"/>
+	</bean>
+	
+	
+
+	<!-- Relie les DAO avec la sessionFactory -->
+	<bean id="countryDAO" class="DAO.CountryDAO">
+	      <property name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	
+	<bean id="streetDAO" class="DAO.StreetDAO">
+	      <property name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+
+	<bean id="AreaDAO" class="DAO.AreaDAO">
+	      <property name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	
+	<bean id="CityDAO" class="DAO.CityDAO">
+	      <property name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	
+	<bean id="LanguageDAO" class="DAO.LanguageDAO">
+	      <property name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	
+	<bean id="SearchDAO" class="DAO.SearchDAO">
+	      <property name="sessionFactory" ref="sessionFactory"/>
+	</bean>  
+  
+  <!--
+  <bean id="countryDAO" class="DAO.CountryDAO">
+        <property name="sessionFactory" ref="sessionFactory" />
+  </bean>
+  -->
+    
+    
+</beans>
